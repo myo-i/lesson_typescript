@@ -13,7 +13,7 @@ function add(num1: number, num2: number, bool: boolean, answer: string) {
 }
 
 
-// 型定義は行わない
+// const number1: number = 5;のように型定義することもできるが、冗長なので行わない（型推論があるから）
 const number1 = 5; // jsやtsでは数値はデフォルトでfloatのため、5も5.0も変わらない
 const number2 = 2.8
 const putResult = true;
