@@ -13,3 +13,6 @@ https://maku.blog/p/ak7u3h3/
 ## npx tsc index.tsを実行したらindex.jsが生成された
 TypeScriptはJavaScriptにコンパイルされるので.tsファイルが.jsファイルに変換されたものが生成される。  
 なのでコンパイル後であれば、.tsファイルでエラーが起きていても実行できる。
+
+## pushできなくなった
+https://zenn.dev/yuri0427/articles/9587ae6a578ee9
