@@ -1,4 +1,4 @@
-function add(num1: number, num2: number, bool: boolean, answer: string) {
+function add1(num1: number, num2: number, bool: boolean, answer: string) {
     // 下記のような型チェックはtypescriptでは冗長になる（言語が型チェックしているため）
     // if (typeof num1 !== 'number' || typeof num2 !== 'number') {
     //     throw new Error('Input type number!!')
@@ -19,5 +19,5 @@ const number2 = 2.8
 const putResult = true;
 const answer = "The answer is "
 
-add(number1, number2, putResult, answer)
+add1(number1, number2, putResult, answer)
 // console.log(result)

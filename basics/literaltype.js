@@ -1,5 +1,5 @@
-function c(input1, input2, option) {
-    var result;
+function c1(input1, input2, option) {
+    let result;
     if (typeof input1 === "number" && typeof input2 === "number" || option === "number") {
         result = +input1 + +input2;
     }
@@ -8,9 +8,9 @@ function c(input1, input2, option) {
     }
     return result;
 }
-var cNumber = c(102, 231, "number");
-console.log(cNumber);
-var cNumber2 = c("917", "354", "number");
-console.log(cNumber);
-var cString = c("good ", "day", "text");
-console.log(cString);
+const cNumberL = c1(102, 231, "number");
+console.log(cNumberL);
+const cNumberL2 = c1("917", "354", "number");
+console.log(cNumberL2);
+const cStringL = c1("good ", "day", "text");
+console.log(cStringL);

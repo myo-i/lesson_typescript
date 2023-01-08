@@ -1,8 +1,8 @@
-let input: unknown;
-let inputName: string;
+let input3: unknown;
+let inputName3: string;
 
-input = 5;
-input = "Mike";
+input3 = 5;
+input3 = "Mike";
 
 
 

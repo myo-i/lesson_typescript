@@ -1,5 +1,5 @@
 function c(input1, input2) {
-    var result;
+    let result;
     if (typeof input1 === "number" && typeof input2 === "number") {
         result = input1 + input2;
     }
@@ -8,7 +8,7 @@ function c(input1, input2) {
     }
     return result;
 }
-var cNumber = c(102, 231);
+const cNumber = c(102, 231);
 console.log(cNumber);
-var cString = c("good ", "day");
+const cString = c("good ", "day");
 console.log(cString);

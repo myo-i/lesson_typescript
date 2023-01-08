@@ -1,6 +1,6 @@
-function add(num1, num2) {
+function add2(num1, num2) {
     return num1 + num2;
 }
-var functionType;
-functionType = add;
+let functionType;
+functionType = add2;
 console.log(functionType(2, 6));

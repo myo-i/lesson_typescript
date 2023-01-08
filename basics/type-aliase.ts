@@ -4,7 +4,7 @@ type TypeOption = "number" | "text";
 // type-aliase初期化例
 const value: TypeCombinable = 123;
 
-function c(
+function c2(
     input1: TypeCombinable, 
     input2: TypeCombinable, 
     option: TypeOption) {
@@ -18,14 +18,14 @@ function c(
 }
 
 
-const cNumber = c(111, 123, "number")
-console.log(cNumber)
+const cNumberTA = c2(111, 123, "number")
+console.log(cNumberTA)
 
-const cNumber2 = c("917", "354", "number")
-console.log(cNumber)
+const cNumber2TA = c2("917", "354", "number")
+console.log(cNumber2TA)
 
-const cString = c("good ", "day", "text")
-console.log(cString)
+const cStringTA = c2("good ", "day", "text")
+console.log(cStringTA)
 
 // type-aliaseは上記のようなunionのみにとどまらない
 // function user(user: { name: string; age: number }) {

@@ -70,7 +70,7 @@ const cENumber = cE(102, 231, As.NUMBER)
 console.log(cENumber)
 
 const cENumber2 = cE("917", "354", As.NUMBER)
-console.log(cENumber)
+console.log(cENumber2)
 
 const cEString = cE("good ", "day", As.TEXT)
 console.log(cEString)
