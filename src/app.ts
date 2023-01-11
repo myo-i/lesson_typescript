@@ -37,6 +37,7 @@ class ProjectInput {
         this.element = templateElNode.firstElementChild as HTMLFormElement;
         this.element.id = "user-input";
 
+        // フォームに入力した値を保持
         this.eleIdTitle = this.element.querySelector("#title") as HTMLInputElement;
         this.eleIdDescription = this.element.querySelector("#description") as HTMLInputElement;
         this.eleIdPeople = this.element.querySelector("#people") as HTMLInputElement;
@@ -45,10 +46,41 @@ class ProjectInput {
         this.attach();
     }
 
+    // フォームに入力した値をタプルとして返す
+    private gatherUserInput(): [string, string, number] | undefined{
+        const enterdTitle = this.eleIdTitle.value;
+        const enterdDescription = this.eleIdDescription.value;
+        const enterdPeople = this.eleIdPeople.value;
+
+        if (
+            // 後にリファクタ
+            enterdTitle.trim().length == 0 ||
+            enterdDescription.trim().length == 0 ||
+            enterdPeople.trim().length == 0 
+        ){
+            alert("Invaid input!!");
+            return;
+        } else {
+            return [enterdTitle, enterdDescription, +enterdPeople];
+        }
+    }
+
+    private clearInputs() {
+        this.eleIdTitle.value = "";
+        this.eleIdDescription.value = "";
+        this.eleIdPeople.value = "";
+    }
+
     @autobind
     private submitHandler(event: Event) {
         event.preventDefault();
-        console.log(this.eleIdTitle.value);
+        // gatherUserInputでフォームに入力した値をコンソールに表示
+        const userInput = this.gatherUserInput();
+        if (Array.isArray(userInput)) {
+            const [title, desc, people] = userInput;
+            console.log(title, desc, people);
+            this.clearInputs();
+        }
     }
 
     private configure() {
