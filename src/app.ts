@@ -1,3 +1,39 @@
+// validation
+interface Validation {
+    value: string | number;
+    // ?を設定することでオプションとして扱うことができる
+    required?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    min?: number;
+    max?: number;
+}
+
+function validate(input: Validation) {
+    let isValid = true;
+    // 最小文字列に対してのvalidation
+    if (input.required) {
+        isValid = isValid && input.value.toString().trim().length !== 0;
+    }
+    if (input.minLength != null && typeof input.value === "string") {
+        isValid = isValid && input.value.length >= input.minLength;
+    }
+
+    // 最大文字列に対してのvalidation
+    if (input.maxLength != null && typeof input.value === "string") {
+        isValid = isValid && input.value.length <= input.maxLength;
+    }
+
+    // number型に対して
+    if (input.min != null && typeof input.value === "number") {
+        isValid = isValid && input.value >= input.min;
+    }
+    if (input.max != null && typeof input.value === "number") {
+        isValid = isValid && input.value <= input.max;
+    }
+    return isValid;
+}
+
 // auto bind
 function autobind(
     _target: any, 
@@ -52,11 +88,29 @@ class ProjectInput {
         const enterdDescription = this.eleIdDescription.value;
         const enterdPeople = this.eleIdPeople.value;
 
+        const titleValidation: Validation = {
+            value: enterdTitle,
+            required: true
+        };
+        const descriptionValidation: Validation = {
+            value: enterdDescription,
+            required: true,
+            minLength: 5
+        };
+        const peopleValidation: Validation = {
+            value: +enterdPeople,
+            required: true,
+            min: 1,
+            max: 5
+        };
+
         if (
-            // 後にリファクタ
-            enterdTitle.trim().length == 0 ||
-            enterdDescription.trim().length == 0 ||
-            enterdPeople.trim().length == 0 
+            // validate(titleValidation) &&
+            // validate(descriptionValidation) &&
+            // validate(peopleValidation)
+            !validate(titleValidation) ||
+            !validate(descriptionValidation) ||
+            !validate(peopleValidation)
         ){
             alert("Invaid input!!");
             return;
