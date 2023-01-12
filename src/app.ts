@@ -51,8 +51,44 @@ function autobind(
     return adjDescriptor;
 }
 
+// about <template id="project-list"> class 
+class ProjectList {
+    templateEl: HTMLTemplateElement;
+    divIdApp: HTMLDivElement;
+    // <section> はただのHYML要素
+    element: HTMLElement;
 
-// main Project
+    constructor(private type: "active" | "finished") {
+        this.templateEl = document.getElementById("project-list") as HTMLTemplateElement;
+        this.divIdApp = document.getElementById("app")! as HTMLDivElement;
+
+
+        const templateElNode = document.importNode(this.templateEl.content, true);
+        // <section> はただのHYML要素
+        this.element = templateElNode.firstElementChild as HTMLElement;
+        // 動的にidを取得
+        this.element.id = `${this.type}-projects`;
+        this.attach();
+        this.renderContent();
+
+    }
+
+    private renderContent() {
+        const listId = `${this.type}-projects-lists`;
+        // 感嘆符でnullを除外
+        this.element.querySelector('ul')!.id = listId;
+        this.element.querySelector('h2')!.textContent = 
+            this.type.toUpperCase() + " PROJECTS";
+    }
+
+    private attach() {
+        // this.elementをdivIdAppが始まる直前に配置
+        this.divIdApp.insertAdjacentElement("beforeend", this.element);
+    }
+}
+
+
+// about <template id="project-input"> class
 class ProjectInput {
     templateEl: HTMLTemplateElement;
     divIdApp: HTMLDivElement;
@@ -142,8 +178,11 @@ class ProjectInput {
     }
 
     private attach() {
+        // this.elementをdivIdAppが始まる直後に配置
         this.divIdApp.insertAdjacentElement("afterbegin", this.element);
     }
 }
 
 const projectInput = new ProjectInput();
+const activePrjList = new ProjectList("active");
+const finishedPrjList = new ProjectList("finished");
