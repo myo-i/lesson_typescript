@@ -20,3 +20,7 @@ https://zenn.dev/yuri0427/articles/9587ae6a578ee9
 ## 一度に複数のtsファイルをコンパイルする
 tsconfig.jsonのoutDirとrootDirを設定し、rootDirににtsファイルを置く。  
 npx tscを実行すると、outDirに設定したディレクトリにコンパイルされたjsファイルが出力される。
+
+## insertAdjacentElementについて
+参考記事  
+https://cly7796.net/blog/javascript/insert-elements-with-javascript/
