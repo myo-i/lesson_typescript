@@ -1,3 +1,57 @@
+// state management
+// 依存関係としてはProjectInput->ProjectState<-ProjectList
+// 処理順としてはProjectInputで入力した値をProjectStateのprojectsに保持
+// tit
+class ProjectState {
+    private listeners: any[] = [];
+    private projects: any[] = [];
+    private static instance: ProjectState;
+
+    private constructor() {
+
+    }
+
+    // これでただ1つのインスタンスを返すことができる
+    static getInstance() {
+        if (this.instance) {
+            return this.instance
+        }
+        this.instance = new ProjectState();
+        return this.instance;
+    }
+
+    addListener(listenerFn: Function) {
+        this.listeners.push(listenerFn);
+    }
+
+    // ProjectInputでsubmitのイベントが発生したときに呼び出される
+    addProject(title: string, description: string, numOfPeople: number) {
+        const newProject = {
+            id: Math.random().toString(),
+            title: title,
+            description: description,
+            people: numOfPeople
+        }
+        this.projects.push(newProject);
+        console.log("propro"+this.projects)
+
+        // listenersにはaddListenerの引数に渡されている関数が丸ごと入っている
+        // projectsには入力した数だけ[title, description, people]の情報が入っている
+        // つまり
+        // listeners = [addListenerのarg, addListenerのarg, addListenerのarg]
+        // projects = [[title: a, description: aa, people:1], 
+        //             [title: b, description: bb, people:2],
+        //             [title: c, description: cc, people:3]]
+        // 最初のforでlisteners[0]とprojects[0]が渡される
+        // 
+        for (const listenerFn of this.listeners) {
+            console.log("aaa"+listenerFn);
+            listenerFn(this.projects.slice());
+        }
+    }
+}
+
+const projectState = ProjectState.getInstance();
 // validation
 interface Validation {
     value: string | number;
@@ -57,10 +111,13 @@ class ProjectList {
     divIdApp: HTMLDivElement;
     // <section> はただのHYML要素
     element: HTMLElement;
+    assignedProjects: any[] = [];
 
     constructor(private type: "active" | "finished") {
+        console.log("Instance ProjectList")
         this.templateEl = document.getElementById("project-list") as HTMLTemplateElement;
         this.divIdApp = document.getElementById("app")! as HTMLDivElement;
+        this.assignedProjects = [];
 
 
         const templateElNode = document.importNode(this.templateEl.content, true);
@@ -68,9 +125,26 @@ class ProjectList {
         this.element = templateElNode.firstElementChild as HTMLElement;
         // 動的にidを取得
         this.element.id = `${this.type}-projects`;
+
+        // ProjectStateのlistenersに引数の関数丸ごと追加している
+        projectState.addListener((projects: any[]) => {
+            this.assignedProjects = projects;
+            this.renderProjects();
+        })
+
         this.attach();
         this.renderContent();
 
+    }
+
+    private renderProjects() {
+        const listEl = document.getElementById(`${this.type}-projects-lists`)! as HTMLUListElement;
+        for (const item of this.assignedProjects) {
+            const listItem = document.createElement('li');
+            listItem.textContent = item.title;
+            listEl.appendChild(listItem);
+            // lecture129の時点でlistElがどんどん蓄積されて同じものが表示されている
+        }
     }
 
     private renderContent() {
@@ -98,6 +172,8 @@ class ProjectInput {
     eleIdPeople: HTMLInputElement;
 
     constructor() {
+        console.log("Instance ProjectInput")
+
         // as ~~ でnullを許容せず、この型を持つことを保証している。「")!」 でも可
         this.templateEl = document.getElementById("project-input") as HTMLTemplateElement;
         // キャスティングする方法もある
@@ -167,8 +243,10 @@ class ProjectInput {
         // gatherUserInputでフォームに入力した値をコンソールに表示
         const userInput = this.gatherUserInput();
         if (Array.isArray(userInput)) {
+            console.log("userInput"+userInput)
             const [title, desc, people] = userInput;
-            console.log(title, desc, people);
+            projectState.addProject(title, desc, people);
+            // console.log(title, desc, people);
             this.clearInputs();
         }
     }
