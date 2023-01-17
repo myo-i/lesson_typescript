@@ -1,10 +1,30 @@
+enum ProjectStatus {
+    Active,
+    Finished
+}
+
+// Project's custom type
+class Project {
+    constructor(
+        public id: string, 
+        public title: string, 
+        public description: string, 
+        public people: number, 
+        public status: ProjectStatus
+        ) {}
+}
+
+// Listener
+// 多分、Project[]を引数とした返り値voidの関数
+type Listener = (items: Project[]) => void;
+
 // state management
 // 依存関係としてはProjectInput->ProjectState<-ProjectList
 // 処理順としてはProjectInputで入力した値をProjectStateのprojectsに保持
 // tit
 class ProjectState {
-    private listeners: any[] = [];
-    private projects: any[] = [];
+    private listeners: Listener[] = [];
+    private projects: Project[] = [];
     private static instance: ProjectState;
 
     private constructor() {
@@ -20,18 +40,19 @@ class ProjectState {
         return this.instance;
     }
 
-    addListener(listenerFn: Function) {
+    addListener(listenerFn: Listener) {
         this.listeners.push(listenerFn);
     }
 
     // ProjectInputでsubmitのイベントが発生したときに呼び出される
     addProject(title: string, description: string, numOfPeople: number) {
-        const newProject = {
-            id: Math.random().toString(),
-            title: title,
-            description: description,
-            people: numOfPeople
-        }
+        const newProject = new Project(
+            Math.random.toString(), 
+            title, 
+            description, 
+            numOfPeople, 
+            ProjectStatus.Active
+            );
         this.projects.push(newProject);
         console.log("propro"+this.projects)
 
@@ -111,7 +132,7 @@ class ProjectList {
     divIdApp: HTMLDivElement;
     // <section> はただのHYML要素
     element: HTMLElement;
-    assignedProjects: any[] = [];
+    assignedProjects: Project[] = [];
 
     constructor(private type: "active" | "finished") {
         console.log("Instance ProjectList")
@@ -127,7 +148,7 @@ class ProjectList {
         this.element.id = `${this.type}-projects`;
 
         // ProjectStateのlistenersに引数の関数丸ごと追加している
-        projectState.addListener((projects: any[]) => {
+        projectState.addListener((projects: Project[]) => {
             this.assignedProjects = projects;
             this.renderProjects();
         })
