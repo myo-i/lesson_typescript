@@ -149,7 +149,13 @@ class ProjectList {
 
         // ProjectStateのlistenersに引数の関数丸ごと追加している
         projectState.addListener((projects: Project[]) => {
-            this.assignedProjects = projects;
+            const relevantProjects = projects.filter(prj => {
+                if (this.type === "active") {
+                    return prj.status === ProjectStatus.Active;
+                }
+                return prj.status === ProjectStatus.Finished;
+            });
+            this.assignedProjects = relevantProjects;
             this.renderProjects();
         })
 
@@ -160,6 +166,7 @@ class ProjectList {
 
     private renderProjects() {
         const listEl = document.getElementById(`${this.type}-projects-lists`)! as HTMLUListElement;
+        listEl.innerHTML = '';
         for (const item of this.assignedProjects) {
             const listItem = document.createElement('li');
             listItem.textContent = item.title;
