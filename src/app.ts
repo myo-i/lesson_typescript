@@ -16,19 +16,27 @@ class Project {
 
 // Listener
 // 多分、Project[]を引数とした返り値voidの関数
-type Listener = (items: Project[]) => void;
+type Listener<T> = (items: T[]) => void;
+
+class State<T> {
+    // protectedはクラス外からアクセスできないが、継承していればアクセスできる
+    protected listeners: Listener<T>[] = [];
+
+    addListener(listenerFn: Listener<T>) {
+        this.listeners.push(listenerFn);
+    }
+}
 
 // state management
 // 依存関係としてはProjectInput->ProjectState<-ProjectList
 // 処理順としてはProjectInputで入力した値をProjectStateのprojectsに保持
 // tit
-class ProjectState {
-    private listeners: Listener[] = [];
+class ProjectState extends State<Project>{
     private projects: Project[] = [];
     private static instance: ProjectState;
 
     private constructor() {
-
+        super();
     }
 
     // これでただ1つのインスタンスを返すことができる
@@ -40,9 +48,6 @@ class ProjectState {
         return this.instance;
     }
 
-    addListener(listenerFn: Listener) {
-        this.listeners.push(listenerFn);
-    }
 
     // ProjectInputでsubmitのイベントが発生したときに呼び出される
     addProject(title: string, description: string, numOfPeople: number) {
@@ -126,28 +131,56 @@ function autobind(
     return adjDescriptor;
 }
 
-// about <template id="project-list"> class 
-class ProjectList {
+//Component base class
+// 継承のためのクラスなのでabstractを付ける（インスタンスを生成できなくなる）
+abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     templateEl: HTMLTemplateElement;
-    divIdApp: HTMLDivElement;
-    // <section> はただのHYML要素
-    element: HTMLElement;
+    divIdApp: T;
+    element: U;
+
+
+    constructor(
+        templateId: string, 
+        divElementId: string, 
+        insertAtStart: boolean,
+        newElementId?: string
+    ) {
+        this.templateEl = document.getElementById(templateId) as HTMLTemplateElement;
+        this.divIdApp = document.getElementById(divElementId)! as T;
+
+        const templateElNode = document.importNode(this.templateEl.content, true);
+        this.element = templateElNode.firstElementChild as U;
+        if(newElementId) {
+            this.element.id = newElementId;
+        }
+        this.attach(insertAtStart)
+    }
+
+    private attach(insertAtBeginning: boolean) {
+        // this.elementをdivIdAppが始まる直前に配置
+        this.divIdApp.insertAdjacentElement(
+            insertAtBeginning ? 'afterend': 'beforeend', 
+            this.element
+            );
+    }
+
+    abstract configure(): void;
+    abstract renderContent(): void;
+} 
+
+// about <template id="project-list"> class 
+class ProjectList extends Component<HTMLDivElement, HTMLElement>{
     assignedProjects: Project[] = [];
 
     constructor(private type: "active" | "finished") {
-        console.log("Instance ProjectList")
-        this.templateEl = document.getElementById("project-list") as HTMLTemplateElement;
-        this.divIdApp = document.getElementById("app")! as HTMLDivElement;
+        super("project-list", "app", false, `${type}-projects-lists`);
         this.assignedProjects = [];
 
+        this.configure();
+        this.renderContent();
+    }
 
-        const templateElNode = document.importNode(this.templateEl.content, true);
-        // <section> はただのHYML要素
-        this.element = templateElNode.firstElementChild as HTMLElement;
-        // 動的にidを取得
-        this.element.id = `${this.type}-projects`;
-
-        // ProjectStateのlistenersに引数の関数丸ごと追加している
+    configure() {
         projectState.addListener((projects: Project[]) => {
             const relevantProjects = projects.filter(prj => {
                 if (this.type === "active") {
@@ -158,10 +191,14 @@ class ProjectList {
             this.assignedProjects = relevantProjects;
             this.renderProjects();
         })
+    }
 
-        this.attach();
-        this.renderContent();
-
+    renderContent() {
+        const listId = `${this.type}-projects-lists`;
+        // 感嘆符でnullを除外
+        this.element.querySelector('ul')!.id = listId;
+        this.element.querySelector('h2')!.textContent = 
+            this.type.toUpperCase() + " PROJECTS";
     }
 
     private renderProjects() {
@@ -174,52 +211,32 @@ class ProjectList {
             // lecture129の時点でlistElがどんどん蓄積されて同じものが表示されている
         }
     }
-
-    private renderContent() {
-        const listId = `${this.type}-projects-lists`;
-        // 感嘆符でnullを除外
-        this.element.querySelector('ul')!.id = listId;
-        this.element.querySelector('h2')!.textContent = 
-            this.type.toUpperCase() + " PROJECTS";
-    }
-
-    private attach() {
-        // this.elementをdivIdAppが始まる直前に配置
-        this.divIdApp.insertAdjacentElement("beforeend", this.element);
-    }
 }
 
 
 // about <template id="project-input"> class
-class ProjectInput {
-    templateEl: HTMLTemplateElement;
-    divIdApp: HTMLDivElement;
-    element: HTMLFormElement;
+class ProjectInput extends Component<HTMLDivElement, HTMLFormElement>{
     eleIdTitle: HTMLInputElement;
     eleIdDescription: HTMLInputElement;
     eleIdPeople: HTMLInputElement;
 
     constructor() {
-        console.log("Instance ProjectInput")
+        super("project-input", "app", true, "user-input");
 
-        // as ~~ でnullを許容せず、この型を持つことを保証している。「")!」 でも可
-        this.templateEl = document.getElementById("project-input") as HTMLTemplateElement;
-        // キャスティングする方法もある
-        // this.HTMLElement = <HTMLElement>document.getElementById("project-input");
-        this.divIdApp = document.getElementById("app") as HTMLDivElement;
-
-
-        const templateElNode = document.importNode(this.templateEl.content, true);
-        this.element = templateElNode.firstElementChild as HTMLFormElement;
-        this.element.id = "user-input";
-
-        // フォームに入力した値を保持
+        // ここに以下の処理を書かないと上記3つのプロパティでエラーが起きる
         this.eleIdTitle = this.element.querySelector("#title") as HTMLInputElement;
         this.eleIdDescription = this.element.querySelector("#description") as HTMLInputElement;
         this.eleIdPeople = this.element.querySelector("#people") as HTMLInputElement;
 
         this.configure();
-        this.attach();
+    }
+
+    configure() {
+        this.element.addEventListener("submit", this.submitHandler);
+    }
+
+    renderContent() {
+        
     }
 
     // フォームに入力した値をタプルとして返す
@@ -279,14 +296,6 @@ class ProjectInput {
         }
     }
 
-    private configure() {
-        this.element.addEventListener("submit", this.submitHandler);
-    }
-
-    private attach() {
-        // this.elementをdivIdAppが始まる直後に配置
-        this.divIdApp.insertAdjacentElement("afterbegin", this.element);
-    }
 }
 
 const projectInput = new ProjectInput();
