@@ -168,6 +168,27 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     abstract renderContent(): void;
 } 
 
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+    private project: Project;
+
+    constructor(hostId: string, project: Project) {
+        super('single-project', hostId, false, project.id);
+
+        this.configure();
+        this.renderContent();
+    }
+
+    configure(): void {
+        
+    }
+
+    renderContent(): void {
+        this.element.querySelector('h2')!.textContent = this.project.title;
+        this.element.querySelector('h3')!.textContent = this.project.people.toString();
+        this.element.querySelector('p')!.textContent = this.project.description;
+    }
+}
+
 // about <template id="project-list"> class 
 class ProjectList extends Component<HTMLDivElement, HTMLElement>{
     assignedProjects: Project[] = [];
@@ -205,10 +226,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>{
         const listEl = document.getElementById(`${this.type}-projects-lists`)! as HTMLUListElement;
         listEl.innerHTML = '';
         for (const item of this.assignedProjects) {
-            const listItem = document.createElement('li');
-            listItem.textContent = item.title;
-            listEl.appendChild(listItem);
-            // lecture129の時点でlistElがどんどん蓄積されて同じものが表示されている
+            new ProjectItem(this.element.querySelector('ul')!.id, item)
         }
     }
 }
