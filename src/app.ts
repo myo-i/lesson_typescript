@@ -171,30 +171,39 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
 class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
     private project: Project;
 
+    get persons() {
+        if (this.project.people === 1) {
+            return '1 person';
+        } else {
+            return `${this.project.people} persons`;
+        }
+    }
+
     constructor(hostId: string, project: Project) {
         super('single-project', hostId, false, project.id);
+        this.project = project;
 
         this.configure();
         this.renderContent();
     }
 
-    configure(): void {
+    configure() {
         
     }
 
-    renderContent(): void {
+    renderContent() {
         this.element.querySelector('h2')!.textContent = this.project.title;
-        this.element.querySelector('h3')!.textContent = this.project.people.toString();
+        this.element.querySelector('h3')!.textContent = this.persons + " assigned";
         this.element.querySelector('p')!.textContent = this.project.description;
     }
 }
 
 // about <template id="project-list"> class 
 class ProjectList extends Component<HTMLDivElement, HTMLElement>{
-    assignedProjects: Project[] = [];
+    assignedProjects: Project[];
 
     constructor(private type: "active" | "finished") {
-        super("project-list", "app", false, `${type}-projects-lists`);
+        super("project-list", "app", false, `${type}-projects`);
         this.assignedProjects = [];
 
         this.configure();
@@ -215,7 +224,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>{
     }
 
     renderContent() {
-        const listId = `${this.type}-projects-lists`;
+        const listId = `${this.type}-projects-list`;
         // 感嘆符でnullを除外
         this.element.querySelector('ul')!.id = listId;
         this.element.querySelector('h2')!.textContent = 
@@ -223,10 +232,10 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>{
     }
 
     private renderProjects() {
-        const listEl = document.getElementById(`${this.type}-projects-lists`)! as HTMLUListElement;
+        const listEl = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
         listEl.innerHTML = '';
         for (const item of this.assignedProjects) {
-            new ProjectItem(this.element.querySelector('ul')!.id, item)
+            new ProjectItem(this.element.querySelector('ul')!.id, item);
         }
     }
 }
