@@ -52,7 +52,7 @@ class ProjectState extends State<Project>{
     // ProjectInputでsubmitのイベントが発生したときに呼び出される
     addProject(title: string, description: string, numOfPeople: number) {
         const newProject = new Project(
-            Math.random.toString(), 
+            Math.random().toString(), 
             title, 
             description, 
             numOfPeople, 
@@ -159,7 +159,7 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     private attach(insertAtBeginning: boolean) {
         // this.elementをdivIdAppが始まる直前に配置
         this.divIdApp.insertAdjacentElement(
-            insertAtBeginning ? 'afterend': 'beforeend', 
+            insertAtBeginning ? 'afterbegin': 'beforeend', 
             this.element
             );
     }
