@@ -71,7 +71,6 @@ class ProjectState extends State<Project>{
             ProjectStatus.Active
             );
         this.projects.push(newProject);
-        console.log("propro"+this.projects)
 
         // listenersにはaddListenerの引数に渡されている関数が丸ごと入っている
         // projectsには入力した数だけ[title, description, people]の情報が入っている
@@ -83,7 +82,6 @@ class ProjectState extends State<Project>{
         // 最初のforでlisteners[0]とprojects[0]が渡される
         // 
         for (const listenerFn of this.listeners) {
-            console.log("aaa"+listenerFn);
             listenerFn(this.projects.slice());
         }
     }
@@ -204,8 +202,8 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements 
         console.log(event)
     }
 
-    dragEndHandler(event: DragEvent): void {
-        
+    dragEndHandler(_: DragEvent): void {
+        console.log("End")
     }
 
     configure() {
@@ -221,7 +219,7 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements 
 }
 
 // about <template id="project-list"> class 
-class ProjectList extends Component<HTMLDivElement, HTMLElement>{
+class ProjectList extends Component<HTMLDivElement, HTMLElement> implements DragTarget{
     assignedProjects: Project[];
 
     constructor(private type: "active" | "finished") {
@@ -232,7 +230,26 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>{
         this.renderContent();
     }
 
+    @autobind
+    dragOverHandler(_: DragEvent): void {
+        const listEl = this.element.querySelector('ul')!;
+        listEl.classList.add('droppable');
+    }
+
+    dropHandler(_: DragEvent): void {
+        
+    }
+
+    @autobind
+    dragLeaveHandler(_: DragEvent): void {
+        const listEl = this.element.querySelector('ul')!;
+        listEl.classList.remove('droppable');
+    }
+
     configure() {
+        this.element.addEventListener("dragover", this.dragOverHandler);
+        this.element.addEventListener("dragleave", this.dragLeaveHandler);
+        this.element.addEventListener("drop", this.dropHandler);
         projectState.addListener((projects: Project[]) => {
             const relevantProjects = projects.filter(prj => {
                 if (this.type === "active") {
@@ -337,7 +354,6 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement>{
         // gatherUserInputでフォームに入力した値をコンソールに表示
         const userInput = this.gatherUserInput();
         if (Array.isArray(userInput)) {
-            console.log("userInput"+userInput)
             const [title, desc, people] = userInput;
             projectState.addProject(title, desc, people);
             // console.log(title, desc, people);
