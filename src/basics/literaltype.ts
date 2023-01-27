@@ -1,4 +1,4 @@
-function c(
+function c1(
     input1: number | string, 
     input2: number | string, 
     option: "number" | "text") {
@@ -12,11 +12,11 @@ function c(
 }
 
 
-const cNumber = c(102, 231, "number")
-console.log(cNumber)
+const cNumberL = c1(102, 231, "number")
+console.log(cNumberL)
 
-const cNumber2 = c("917", "354", "number")
-console.log(cNumber)
+const cNumberL2 = c1("917", "354", "number")
+console.log(cNumberL2)
 
-const cString = c("good ", "day", "text")
-console.log(cString)
+const cStringL = c1("good ", "day", "text")
+console.log(cStringL)
