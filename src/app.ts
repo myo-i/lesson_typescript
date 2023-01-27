@@ -71,7 +71,23 @@ class ProjectState extends State<Project>{
             ProjectStatus.Active
             );
         this.projects.push(newProject);
+        this.updateListeners();
+    }
 
+    // ドロップした際に下記のメソッドを呼び出す
+    // addProjectでProjectを作成した際にidにランダムで数字が入っている
+    // findメソッドで配列の中にある要素の内、idが一致する最初の要素のデータをprojectに入れる
+    // projectが存在すればステータスを切り替えてupdateListenersでレンダリングする
+    moveProject(projectId: string, newStatus: ProjectStatus) {
+        // アロー関数の使い方　Arrays.Method(Array => Array + 1);
+        const project = this.projects.find(prj => prj.id === projectId);
+        if (project && project.status !== newStatus) {
+            project.status = newStatus;
+            this.updateListeners();
+        }
+    }
+
+    private updateListeners() {
         // listenersにはaddListenerの引数に渡されている関数が丸ごと入っている
         // projectsには入力した数だけ[title, description, people]の情報が入っている
         // つまり
@@ -242,8 +258,11 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
     }
 
     // eventをブラウザのコンソールで見るとdataTransferというプロパティがありその中のデータを見れる
+    @autobind
     dropHandler(event: DragEvent): void {
-        console.log(event.dataTransfer!.getData('text/plain'));
+        // console.log(event.dataTransfer!.getData('text/plain'));
+        const prjId = event.dataTransfer!.getData('text/plain');
+        projectState.moveProject(prjId, this.type === "active" ? ProjectStatus.Active : ProjectStatus.Finished);
     }
 
     @autobind
