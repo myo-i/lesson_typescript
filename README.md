@@ -24,3 +24,12 @@ npx tscを実行すると、outDirに設定したディレクトリにコンパ�
 ## insertAdjacentElementについて
 参考記事  
 https://cly7796.net/blog/javascript/insert-elements-with-javascript/
+
+## tsconfig.jsonを変更したのに反映されない...
+コンパイルすると  
+```Property 'includes' does not exist on type 'string'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2015' or later.```  
+が発生する。  
+原因はコンパイル時にファイル名を指定してたから  
+
+参考記事  
+https://qiita.com/RyosukeSomeya/items/3ef53eb42b890f419472
